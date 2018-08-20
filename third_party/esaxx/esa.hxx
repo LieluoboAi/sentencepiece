@@ -30,7 +30,7 @@
 #include <vector>
 #include <utility>
 #include <cassert>
-#include "sais.hxx"
+#include "third_party/esaxx/sais.hxx"
 
 namespace esaxx_private {
 template<typename string_type, typename sarray_type, typename index_type>
