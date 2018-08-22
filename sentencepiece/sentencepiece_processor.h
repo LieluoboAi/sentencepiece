@@ -21,9 +21,7 @@
 #include <utility>
 #include <vector>
 #include "sentencepiece/util.h"
-namespace absl {
-class string_view;
-}  // namespace absl
+#include "absl/strings/string_view.h"
 
 namespace sentencepiece {
 
