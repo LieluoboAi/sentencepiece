@@ -16,8 +16,8 @@
 #define UTIL_H_
 
 #include <stdio.h>
-#include <string.h>
-
+// #include <string.h>
+#include <cstring>
 #include <algorithm>
 #include <fstream>
 #include <memory>
