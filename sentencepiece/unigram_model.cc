@@ -312,7 +312,7 @@ std::vector<std::vector<Lattice::Node *>> Lattice::NBest(size_t nbest_size) {
     constexpr int kMaxAgendaSize = 100000;
     constexpr int kMinAgendaSize = 512;
     if (agenda.size() >= kMaxAgendaSize) {
-      LOG(WARNING) << "Too big agenda. shrinking";
+      // LOG(WARNING) << "Too big agenda. shrinking";
       // Keeps the top `kMinAgendaSize` hypothesis.
       Agenda new_agenda;
       const int size = std::min<int>(kMinAgendaSize, nbest_size * 10);
