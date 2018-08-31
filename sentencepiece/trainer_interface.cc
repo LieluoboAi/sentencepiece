@@ -83,6 +83,14 @@ bool TrainerInterface::IsValidSentencePiece(
     return false;
   }
 
+  std::string utf8str = string_util::UnicodeTextToUTF8(sentencepiece);
+  if (utf8str == "c端" || utf8str == "c++" || utf8str == "c#" ||
+      utf8str == "b端" || utf8str == "o2o" || utf8str == "p2p" ||
+      utf8str == "b2b" || utf8str == ".net" || utf8str == "b2c" ||
+      utf8str == "c2c") {
+    return true;
+  }
+
   size_t pos = 0;
   unicode_script::ScriptType prev_script =
       static_cast<unicode_script::ScriptType>(-1);

@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "sentencepiece_processor.h"
+#include "sentencepiece/sentencepiece_processor.h"
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/op_kernel.h"
 #include "tensorflow/core/framework/shape_inference.h"
