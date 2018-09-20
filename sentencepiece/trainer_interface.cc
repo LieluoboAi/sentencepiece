@@ -87,7 +87,7 @@ bool TrainerInterface::IsValidSentencePiece(
   if (utf8str == "c端" || utf8str == "c++" || utf8str == "c#" ||
       utf8str == "b端" || utf8str == "o2o" || utf8str == "p2p" ||
       utf8str == "b2b" || utf8str == ".net" || utf8str == "b2c" ||
-      utf8str == "c2c") {
+      utf8str == "c2c" || utf8str == "node.js" || utf8str == "4a") {
     return true;
   }
 

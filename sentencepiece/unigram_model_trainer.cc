@@ -30,14 +30,15 @@
 #include <vector>
 
 #include "sentencepiece/normalizer.h"
-#include "third_party/esaxx/esa.hxx"  // Suffix array library.
 #include "sentencepiece/unicode_script.h"
 #include "sentencepiece/util.h"
+#include "third_party/esaxx/esa.hxx"  // Suffix array library.
 
 namespace sentencepiece {
 namespace unigram {
 namespace {
 
+static const int kMaxFreq4Token=4000;
 double Digamma(double x) {
   double result = 0.0;
   for (; x < 7; ++x) result -= 1 / x;
@@ -95,7 +96,7 @@ void TrainerModel::SetSentencePieces(SentencePieces &&sentencepieces) {
   std::vector<std::pair<absl::string_view, int>> pieces;
   for (size_t i = 0; i < sentencepieces_.size(); ++i) {
     const absl::string_view w = sentencepieces_[i].first;  // piece
-    const float score = sentencepieces_[i].second;   // score.
+    const float score = sentencepieces_[i].second;         // score.
     CHECK(!std::isnan(score));
     pieces.emplace_back(w, i);
     min_score_ = std::min(min_score_, score);
@@ -170,6 +171,10 @@ TrainerModel::SentencePieces Trainer::MakeSeedSentencePieces() const {
 
     // character-wise coverage is the default score.
     const int freq = R[i] - L[i];
+
+    if (freq > kMaxFreq4Token) {
+      continue;
+    }
     const int score = freq * len;
     substr_index.emplace_back(i, score);
   }
