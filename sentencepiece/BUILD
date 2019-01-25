@@ -37,11 +37,11 @@ cc_library(
     hdrs = ["sentencepiece_processor.h"],
     deps = [
         ":common",
-        "@com_google_absl//absl/strings",
         ":model_factory",
         ":sentencepiece_cc_proto",
         ":flags",
         ":normalizer",
+        "@com_google_absl//:absl_header",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_library(
     ],
     deps = [
         ":common",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl_header",
     ],
 )
 
@@ -64,6 +64,7 @@ cc_library(
     ],
     deps = [
         ":util",
+        "@com_google_absl//:absl_header",
     ],
 )
 

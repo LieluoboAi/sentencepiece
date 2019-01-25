@@ -38,7 +38,7 @@ namespace sentencepiece {
 namespace unigram {
 namespace {
 
-static const int kMaxFreq4Token=4000;
+static const int kMaxFreq4Token = 4000;
 double Digamma(double x) {
   double result = 0.0;
   for (; x < 7; ++x) result -= 1 / x;
@@ -172,9 +172,6 @@ TrainerModel::SentencePieces Trainer::MakeSeedSentencePieces() const {
     // character-wise coverage is the default score.
     const int freq = R[i] - L[i];
 
-    if (freq > kMaxFreq4Token) {
-      continue;
-    }
     const int score = freq * len;
     substr_index.emplace_back(i, score);
   }
@@ -535,5 +532,96 @@ util::Status Trainer::Train() {
 
   return Save();
 }
+
+static int get_char_type(char32 c) {
+  if (c < 255) {
+    return 1;
+  } else {
+    return 2;
+  }
+}
+
+bool Trainer::IsValidSentencePiece(const UnicodeText &sentencepiece) const {
+  // Returns false if the length of piece is invalid.
+  std::string utf8str;
+  if (sentencepiece.empty()) {
+    return false;
+  }
+  if (sentencepiece.size() >
+      static_cast<size_t>(2 * trainer_spec_.max_sentencepiece_length())) {
+    return false;
+  }
+  utf8str = string_util::UnicodeTextToUTF8(sentencepiece);
+  if (sentencepiece.size() >
+      static_cast<size_t>(trainer_spec_.max_sentencepiece_length())) {
+    return false;
+  }
+  if (utf8str.size() > 1 && (utf8str.find("/") != std::string::npos ||
+                             utf8str.find(",") != std::string::npos ||
+                             utf8str.find(")") != std::string::npos ||
+                             utf8str.find("(") != std::string::npos ||
+                             utf8str.find(":") != std::string::npos ||
+                             utf8str.find(";") != std::string::npos)) {
+    return false;
+  }
+  size_t pos = 0;
+  int prev_script = -1;
+  unicode_script::ScriptType prev_script2 =
+      static_cast<unicode_script::ScriptType>(-1);
+
+  for (auto it = sentencepiece.begin(); it != sentencepiece.end(); ++it) {
+    if (*it == kUNKChar) {  // UNK must not be included
+      return false;
+    }
+    if (*it == 0x0000) {  // NULL is not allowed for Darts (TRIE).
+      return false;
+    }
+    // kUPPBoundaryChar is included when split_by_upp_for_training is true.
+    if (*it == kUPPBoundaryChar) {
+      return false;
+    }
+    if (*it == 0x0020) {
+      LOG(WARNING) << "space must not be included in normalized string.";
+      return false;
+    }
+    if (!string_util::IsValidCodepoint(*it)) {
+      return false;
+    }
+    if (*it == kWSChar) {
+      if (pos > 0) {
+        return false;
+      } else if (pos == 0 && sentencepiece.size() > 1) {
+        return false;
+      }
+    } else {
+      auto s = get_char_type(*it);
+      auto s2 = unicode_script::GetScript(*it);
+      // Merge Hiragana/Katakana into Han.
+      if (s2 == unicode_script::U_Hiragana ||
+          s2 == unicode_script::U_Katakana ||
+          *it == 0x30FC) {  // long vowel sound (Katakana) should be Katakana
+        s2 = unicode_script::U_Han;
+      }
+      // Do not allow a piece to include multiple Unicode scripts
+      // when split_by_unicode_script() is true (default = true).
+      if (prev_script != -1 && prev_script != s &&
+          trainer_spec_.split_by_unicode_script()) {
+        return false;
+      }
+      prev_script = s;
+      if (prev_script2 != static_cast<unicode_script::ScriptType>(-1) &&
+          prev_script2 != s2 && trainer_spec_.split_by_unicode_script()) {
+        return false;
+      }
+      prev_script2 = s2;
+    }
+    ++pos;
+  }
+  if (prev_script == 2 && sentencepiece.size() > 1) {
+    return false;
+  }
+  return true;
+}
+
 }  // namespace unigram
 }  // namespace sentencepiece

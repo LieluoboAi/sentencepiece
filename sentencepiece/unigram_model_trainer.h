@@ -83,6 +83,12 @@ class Trainer : public TrainerInterface {
 
   util::Status Train() override;
 
+ protected:
+    // Returns true if |piece| is valid sentence piece.
+  // The result is affected by
+  // max_sentencepiece_length, split_by_whiespace, split_by_unicode_script.
+  bool IsValidSentencePiece(const UnicodeText &piece) const override;
+
  private:
   FRIEND_TEST(TrainerTest, IsValidSentencePieceTest);
 

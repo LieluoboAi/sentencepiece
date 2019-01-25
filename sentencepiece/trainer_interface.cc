@@ -77,13 +77,30 @@ TrainerInterface::~TrainerInterface() {}
 bool TrainerInterface::IsValidSentencePiece(
     const string_util::UnicodeText &sentencepiece) const {
   // Returns false if the length of piece is invalid.
-  if (sentencepiece.empty() ||
-      sentencepiece.size() >
-          static_cast<size_t>(trainer_spec_.max_sentencepiece_length())) {
+  std::string utf8str;
+  if (sentencepiece.empty()) {
     return false;
   }
-
-  std::string utf8str = string_util::UnicodeTextToUTF8(sentencepiece);
+  if (sentencepiece.size() >
+      static_cast<size_t>(2 * trainer_spec_.max_sentencepiece_length())) {
+    return false;
+  }
+  utf8str = string_util::UnicodeTextToUTF8(sentencepiece);
+  if (sentencepiece.size() >
+      static_cast<size_t>(trainer_spec_.max_sentencepiece_length())) {
+    if (utf8str.size() >
+        static_cast<size_t>(trainer_spec_.max_sentencepiece_length() * 2)) {
+      return false;
+    }
+  }
+  if (sentencepiece.size() > 1 && strncmp(utf8str.c_str(), "的", 3) == 0) {
+    return false;
+  }
+  if (sentencepiece.size() > 2 &&
+      (strncmp(utf8str.c_str(), "和", 3) == 0 ||
+       strncmp(utf8str.c_str() + utf8str.size() - 3, "和", 3) == 0)) {
+    return false;
+  }
   if (utf8str == "c端" || utf8str == "c++" || utf8str == "c#" ||
       utf8str == "b端" || utf8str == "o2o" || utf8str == "p2p" ||
       utf8str == "b2b" || utf8str == ".net" || utf8str == "b2c" ||
