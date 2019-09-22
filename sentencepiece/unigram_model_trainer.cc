@@ -28,17 +28,19 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-
+#include "sentencepiece/flags.h"
 #include "sentencepiece/normalizer.h"
 #include "sentencepiece/unicode_script.h"
 #include "sentencepiece/util.h"
 #include "third_party/esaxx/esa.hxx"  // Suffix array library.
 
+DEFINE_bool(only_one_chinese, true, "only allow one chinese char");
+
 namespace sentencepiece {
 namespace unigram {
 namespace {
 
-static const int kMaxFreq4Token = 4000;
+static const int kMaxFreq4Token = 40000;
 double Digamma(double x) {
   double result = 0.0;
   for (; x < 7; ++x) result -= 1 / x;
@@ -617,7 +619,7 @@ bool Trainer::IsValidSentencePiece(const UnicodeText &sentencepiece) const {
     }
     ++pos;
   }
-  if (prev_script == 2 && sentencepiece.size() > 1) {
+  if (FLAGS_only_one_chinese && prev_script == 2 && sentencepiece.size() > 1) {
     return false;
   }
   return true;
