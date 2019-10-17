@@ -48,7 +48,7 @@ static constexpr char kDefaultNormalizerName[] = "nfkc";
 Builder::Chars UnicodeNormalize(UNormalizationMode mode,
                                 const Builder::Chars &input) {
   const std::string utf8 = string_util::UnicodeTextToUTF8(input);
-  CHECK(!utf8.empty());
+  SPCHECK(!utf8.empty());
 
   icu::UnicodeString ustr;
   const size_t utf8_length = utf8.size();
@@ -62,7 +62,7 @@ Builder::Chars UnicodeNormalize(UNormalizationMode mode,
   UErrorCode status = U_ZERO_ERROR;
   icu::UnicodeString dst;
   icu::Normalizer::normalize(ustr, mode, 0, dst, status);
-  CHECK(U_SUCCESS(status));
+  SPCHECK(U_SUCCESS(status));
   std::string normalized;
   normalized.reserve(dst.length() * 3);
   dst.toUTF8String(normalized);
@@ -91,7 +91,7 @@ Builder::Chars ToNFD(const Builder::Chars &input) {
 std::vector<Builder::Chars> ExpandUnnormalized(
     const Builder::Chars &nfkd,
     const std::map<char32, std::set<char32>> &norm2orig) {
-  CHECK(!nfkd.empty());
+  SPCHECK(!nfkd.empty());
   std::vector<Builder::Chars> results;
   for (const auto c : port::FindOrDie(norm2orig, nfkd[0])) {
     results.push_back({c});
@@ -137,7 +137,7 @@ Builder::Chars Normalize(const Builder::CharsMap &chars_map,
       normalized.push_back(src[i]);
       ++i;
     } else {
-      CHECK(!it->second.empty());
+      SPCHECK(!it->second.empty());
       std::copy(it->second.begin(), it->second.end(),
                 std::back_inserter(normalized));
       i += it->first.size();
@@ -154,7 +154,7 @@ util::Status Builder::CompileCharsMap(const CharsMap &chars_map,
   CHECK_OR_RETURN(output);
   CHECK_OR_RETURN(!chars_map.empty());
 
-  LOG(INFO) << "Loading CharsMap of size=" << chars_map.size();
+  SPLOG(INFO) << "Loading CharsMap of size=" << chars_map.size();
 
   // Aggregates the same target strings to save footprint.
   std::map<Chars, int> normalized2pos;
@@ -210,7 +210,7 @@ util::Status Builder::CompileCharsMap(const CharsMap &chars_map,
                               trie.size() * trie.unit_size());
   *output = Normalizer::EncodePrecompiledCharsMap(trie_blob, normalized);
 
-  LOG(INFO) << "Generated normalizer blob. size=" << output->size();
+  SPLOG(INFO) << "Generated normalizer blob. size=" << output->size();
 
   return util::OkStatus();
 }
@@ -292,7 +292,7 @@ util::Status Builder::GetPrecompiledCharsMap(const std::string &name,
 // static
 util::Status Builder::BuildNFKCMap(CharsMap *chars_map) {
 #ifdef ENABLE_NFKC_COMPILE
-  LOG(INFO) << "Running BuildNFKCMap";
+  SPLOG(INFO) << "Running BuildNFKCMap";
 
   // Set of fully NFKD decomposed characters.
   std::set<Builder::Chars> nfkd_decomposed;
@@ -341,7 +341,7 @@ util::Status Builder::BuildNFKCMap(CharsMap *chars_map) {
   *chars_map = std::move(nfkc_map);
 
 #else
-  LOG(ERROR) << "NFKC compile is not enabled."
+  SPLOG(ERROR) << "NFKC compile is not enabled."
              << " rebuild with ./configure --enable-nfkc-compile";
 #endif
 
@@ -350,7 +350,7 @@ util::Status Builder::BuildNFKCMap(CharsMap *chars_map) {
 
 util::Status Builder::BuildNmtNFKCMap(CharsMap *chars_map) {
 #ifdef ENABLE_NFKC_COMPILE
-  LOG(INFO) << "Running BuildNmtNFKCMap";
+  SPLOG(INFO) << "Running BuildNmtNFKCMap";
 
   CharsMap nfkc_map;
   RETURN_IF_ERROR(Builder::BuildNFKCMap(&nfkc_map));
@@ -379,7 +379,7 @@ util::Status Builder::BuildNmtNFKCMap(CharsMap *chars_map) {
   *chars_map = std::move(nfkc_map);
 
 #else
-  LOG(ERROR) << "NFKC compile is not enabled."
+  SPLOG(ERROR) << "NFKC compile is not enabled."
              << " rebuild with ./configure --enable-nfkc-compile";
 #endif
 
@@ -419,7 +419,7 @@ util::Status Builder::BuildNFKC_CFMap(CharsMap *chars_map) {
   RETURN_IF_ERROR(Builder::MergeUnicodeCaseFoldMap(&nfkc_map));
   *chars_map = std::move(nfkc_map);
 #else
-  LOG(ERROR) << "NFKC_CF compile is not enabled."
+  SPLOG(ERROR) << "NFKC_CF compile is not enabled."
              << " rebuild with ./configure --enable-nfkc-compile";
 #endif
 
@@ -434,7 +434,7 @@ util::Status Builder::BuildNmtNFKC_CFMap(CharsMap *chars_map) {
   RETURN_IF_ERROR(Builder::MergeUnicodeCaseFoldMap(&nfkc_map));
   *chars_map = std::move(nfkc_map);
 #else
-  LOG(ERROR) << "NMT_NFKC_CF compile is not enabled."
+  SPLOG(ERROR) << "NMT_NFKC_CF compile is not enabled."
              << " rebuild with ./configure --enable-nfkc-compile";
 #endif
 
@@ -444,7 +444,7 @@ util::Status Builder::BuildNmtNFKC_CFMap(CharsMap *chars_map) {
 // static
 util::Status Builder::LoadCharsMap(absl::string_view filename,
                                    CharsMap *chars_map) {
-  LOG(INFO) << "Loading maping file: " << filename.data();
+  SPLOG(INFO) << "Loading maping file: " << filename.data();
   CHECK_OR_RETURN(chars_map);
 
   io::InputBuffer input(filename);

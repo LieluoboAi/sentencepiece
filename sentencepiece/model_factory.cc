@@ -41,7 +41,7 @@ std::unique_ptr<ModelInterface> ModelFactory::Create(
       return port::MakeUnique<character::Model>(model_proto);
       break;
     default:
-      LOG(ERROR) << "Unknown model_type: " << trainer_spec.model_type();
+      SPLOG(ERROR) << "Unknown model_type: " << trainer_spec.model_type();
       return nullptr;
       break;
   }

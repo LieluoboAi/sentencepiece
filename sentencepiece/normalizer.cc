@@ -30,7 +30,7 @@ Normalizer::Normalizer(const NormalizerSpec &spec)
     : spec_(&spec), status_(util::OkStatus()) {
   absl::string_view index = spec.precompiled_charsmap();
   if (index.empty()) {
-    LOG(INFO) << "precompiled_charsmap is empty. use identity normalization.";
+    SPLOG(INFO) << "precompiled_charsmap is empty. use identity normalization.";
   } else {
     absl::string_view trie_blob, normalized;
     status_ = DecodePrecompiledCharsMap(index, &trie_blob, &normalized);

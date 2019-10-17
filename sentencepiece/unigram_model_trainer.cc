@@ -92,14 +92,14 @@ const TrainerModel::SentencePieces &TrainerModel::GetSentencePieces() const {
 
 void TrainerModel::SetSentencePieces(SentencePieces &&sentencepieces) {
   sentencepieces_ = std::move(sentencepieces);
-  CHECK(!sentencepieces_.empty());
+  SPCHECK(!sentencepieces_.empty());
 
   min_score_ = FLT_MAX;
   std::vector<std::pair<absl::string_view, int>> pieces;
   for (size_t i = 0; i < sentencepieces_.size(); ++i) {
     const absl::string_view w = sentencepieces_[i].first;  // piece
     const float score = sentencepieces_[i].second;         // score.
-    CHECK(!std::isnan(score));
+    SPCHECK(!std::isnan(score));
     pieces.emplace_back(w, i);
     min_score_ = std::min(min_score_, score);
   }
@@ -110,8 +110,8 @@ void TrainerModel::SetSentencePieces(SentencePieces &&sentencepieces) {
 
 // Returns seed sentencepieces for EM training.
 TrainerModel::SentencePieces Trainer::MakeSeedSentencePieces() const {
-  CHECK(!sentences_.empty());
-  CHECK(!required_chars_.empty());
+  SPCHECK(!sentences_.empty());
+  SPCHECK(!required_chars_.empty());
 
   // Merges all sentences into one array with 0x0000 delimiter.
   std::vector<char32> array;
@@ -120,7 +120,7 @@ TrainerModel::SentencePieces Trainer::MakeSeedSentencePieces() const {
 
   const size_t mining_size =
       std::min<size_t>(sentences_.size(), trainer_spec_.mining_sentence_size());
-  LOG(INFO) << "Using " << mining_size
+  SPLOG(INFO) << "Using " << mining_size
             << " sentences for making seed sentencepieces";
 
   std::vector<std::string> mining_sentences(mining_size);
@@ -148,11 +148,11 @@ TrainerModel::SentencePieces Trainer::MakeSeedSentencePieces() const {
   // more than 2 times in the sentence.
   constexpr int kAlphabetSize = 0x110000;  // All UCS4 range.
   int node_num = 0;
-  LOG(INFO) << "Making suffix array...";
+  SPLOG(INFO) << "Making suffix array...";
   CHECK_EQ(0, esaxx(array.begin(), SA.begin(), L.begin(), R.begin(), D.begin(),
                     n, kAlphabetSize, node_num));
 
-  LOG(INFO) << "Extracting frequent sub strings...";
+  SPLOG(INFO) << "Extracting frequent sub strings...";
   std::vector<std::pair<int, int>> substr_index;
   for (int i = 0; i < node_num; ++i) {
     const int offset = SA[L[i]];
@@ -192,19 +192,19 @@ TrainerModel::SentencePieces Trainer::MakeSeedSentencePieces() const {
     const char32 *begin = &array[offset];
     const char32 *end = &array[offset + len];
     const UnicodeText uw(begin, end);
-    CHECK(IsValidSentencePiece(uw));  // just in case.
+    SPCHECK(IsValidSentencePiece(uw));  // just in case.
     const std::string w = string_util::UnicodeTextToUTF8(uw);
     if (seed_sentencepieces.size() ==
         static_cast<size_t>(trainer_spec_.seed_sentencepiece_size())) {
       break;
     }
-    CHECK(!port::ContainsKey(all_chars, w));
+    SPCHECK(!port::ContainsKey(all_chars, w));
     seed_sentencepieces.emplace_back(w, p.second);
   }
 
   ToLogProb(seed_sentencepieces.begin(), seed_sentencepieces.end());
 
-  LOG(INFO) << "Initialized " << seed_sentencepieces.size()
+  SPLOG(INFO) << "Initialized " << seed_sentencepieces.size()
             << " seed sentencepieces";
 
   return seed_sentencepieces;
@@ -236,7 +236,7 @@ std::vector<float> Trainer::RunEStep(const TrainerModel &model, float *obj,
         model.PopulateNodes(&lattice);
         const float Z = lattice.PopulateMarginal(freq, &expected[n]);
         ntokens[n] += lattice.Viterbi().size();
-        CHECK(!std::isnan(Z))
+        SPCHECK(!std::isnan(Z))
             << "likelihood is NAN. Input sentence may be too long";
         objs[n] -= Z / all_sentence_freq;
       }
@@ -255,7 +255,7 @@ std::vector<float> Trainer::RunEStep(const TrainerModel &model, float *obj,
 
   *obj = objs[0];
   *num_tokens = ntokens[0];
-  CHECK(!std::isnan(*obj));
+  SPCHECK(!std::isnan(*obj));
 
   return expected[0];
 }
@@ -475,7 +475,7 @@ TrainerModel::SentencePieces Trainer::FinalizeSentencePieces(
 util::Status Trainer::Train() {
   RETURN_IF_ERROR(status());
 
-  LOG(INFO) << "Starts training with : \n" << trainer_spec_.Utf8DebugString();
+  SPLOG(INFO) << "Starts training with : \n" << trainer_spec_.Utf8DebugString();
 
   CHECK_EQ_OR_RETURN(TrainerSpec::UNIGRAM, trainer_spec_.model_type());
   CHECK_OR_RETURN(normalizer_spec_.escape_whitespaces());
@@ -496,7 +496,7 @@ util::Status Trainer::Train() {
     sentences_.resize(training_size);
   }
 
-  LOG(INFO) << "Using " << sentences_.size() << " sentences for EM training";
+  SPLOG(INFO) << "Using " << sentences_.size() << " sentences for EM training";
 
   desired_vocab_size_ = static_cast<size_t>(trainer_spec_.vocab_size() * 1.1);
 
@@ -512,7 +512,7 @@ util::Status Trainer::Train() {
       auto new_sentencepieces = RunMStep(model, expected);
       model.SetSentencePieces(std::move(new_sentencepieces));
 
-      LOG(INFO) << "EM sub_iter=" << iter << " size=" << model.GetPieceSize()
+      SPLOG(INFO) << "EM sub_iter=" << iter << " size=" << model.GetPieceSize()
                 << " obj=" << objective << " num_tokens=" << num_tokens
                 << " num_tokens/piece="
                 << 1.0 * num_tokens / model.GetPieceSize();
@@ -583,7 +583,7 @@ bool Trainer::IsValidSentencePiece(const UnicodeText &sentencepiece) const {
       return false;
     }
     if (*it == 0x0020) {
-      LOG(WARNING) << "space must not be included in normalized string.";
+      SPLOG(WARNING) << "space must not be included in normalized string.";
       return false;
     }
     if (!string_util::IsValidCodepoint(*it)) {

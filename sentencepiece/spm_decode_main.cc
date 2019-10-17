@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         output.WriteLine(spt.Utf8DebugString());
       };
     } else {
-      LOG(FATAL) << "Unknown output format: " << FLAGS_output_format;
+      SPLOG(FATAL) << "Unknown output format: " << FLAGS_output_format;
     }
   } else if (FLAGS_input_format == "id") {
     if (FLAGS_output_format == "string") {
@@ -81,10 +81,10 @@ int main(int argc, char *argv[]) {
         output.WriteLine(spt.Utf8DebugString());
       };
     } else {
-      LOG(FATAL) << "Unknown output format: " << FLAGS_output_format;
+      SPLOG(FATAL) << "Unknown output format: " << FLAGS_output_format;
     }
   } else {
-    LOG(FATAL) << "Unknown input format: " << FLAGS_input_format;
+    SPLOG(FATAL) << "Unknown input format: " << FLAGS_input_format;
   }
 
   for (const auto &filename : rest_args) {

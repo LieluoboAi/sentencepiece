@@ -77,17 +77,17 @@ Training is peformed by passing parameters of [spm_train](https://github.com/goo
 ```
 >>> import sentencepiece as spm
 >>> spm.SentencePieceTrainer.Train('--input=test/botchan.txt --model_prefix=m --vocab_size=1000')
-unigram_model_trainer.cc(494) LOG(INFO) Starts training with : 
+unigram_model_trainer.cc(494) SPLOG(INFO) Starts training with : 
 input: "test/botchan.txt"
 model_prefix: "m"
 model_type: UNIGRAM
 ..snip..
-unigram_model_trainer.cc(529) LOG(INFO) EM sub_iter=0 size=1239 obj=10.4055 num_tokens=36256 num_tokens/piece=29.2623
-unigram_model_trainer.cc(529) LOG(INFO) EM sub_iter=1 size=1239 obj=10.3187 num_tokens=36256 num_tokens/piece=29.2623
-unigram_model_trainer.cc(529) LOG(INFO) EM sub_iter=0 size=1100 obj=10.5285 num_tokens=37633 num_tokens/piece=34.2118
-unigram_model_trainer.cc(529) LOG(INFO) EM sub_iter=1 size=1100 obj=10.4973 num_tokens=37630 num_tokens/piece=34.2091
-trainer_interface.cc(284) LOG(INFO) Saving model: m.model
-trainer_interface.cc(293) LOG(INFO) Saving vocabs: m.vocab
+unigram_model_trainer.cc(529) SPLOG(INFO) EM sub_iter=0 size=1239 obj=10.4055 num_tokens=36256 num_tokens/piece=29.2623
+unigram_model_trainer.cc(529) SPLOG(INFO) EM sub_iter=1 size=1239 obj=10.3187 num_tokens=36256 num_tokens/piece=29.2623
+unigram_model_trainer.cc(529) SPLOG(INFO) EM sub_iter=0 size=1100 obj=10.5285 num_tokens=37633 num_tokens/piece=34.2118
+unigram_model_trainer.cc(529) SPLOG(INFO) EM sub_iter=1 size=1100 obj=10.4973 num_tokens=37630 num_tokens/piece=34.2091
+trainer_interface.cc(284) SPLOG(INFO) Saving model: m.model
+trainer_interface.cc(293) SPLOG(INFO) Saving vocabs: m.vocab
 >>>
 ```
 

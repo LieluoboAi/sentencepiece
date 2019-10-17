@@ -89,13 +89,13 @@ class ModelInterface {
   // The same as above, but returns nbest result with score.
   virtual NBestEncodeResult NBestEncode(absl::string_view normalized,
                                         int nbest_size) const {
-    LOG(ERROR) << "Not implemented.";
+    SPLOG(ERROR) << "Not implemented.";
     return NBestEncodeResult();
   }
 
   virtual EncodeResult SampleEncode(absl::string_view normalized,
                                     float alpha) const {
-    LOG(ERROR) << "Not implemented.";
+    SPLOG(ERROR) << "Not implemented.";
     return EncodeResult();
   }
 

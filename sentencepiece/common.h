@@ -142,25 +142,25 @@ enum LogSeverity {
 }  // namespace logging
 }  // namespace sentencepiece
 
-#define LOG(severity)                                                     \
+#define SPLOG(severity)                                                     \
   ::sentencepiece::error::Die(::sentencepiece::logging::LOG_##severity >= \
                               ::sentencepiece::logging::LOG_FATAL) &      \
       std::cerr << __FILE__ << "(" << __LINE__ << ") "                    \
-                << "LOG(" << #severity << ") "
+                << "SPLOG(" << #severity << ") "
 
-#define CHECK(condition)                                              \
+#define SPCHECK(condition)                                              \
   (condition) ? 0                                                     \
               : ::sentencepiece::error::Die(true) &                   \
                     std::cerr << __FILE__ << "(" << __LINE__ << ") [" \
                               << #condition << "] "
 
 #define CHECK_STREQ(a, b) CHECK_EQ(std::string(a), std::string(b))
-#define CHECK_EQ(a, b) CHECK((a) == (b))
-#define CHECK_NE(a, b) CHECK((a) != (b))
-#define CHECK_GE(a, b) CHECK((a) >= (b))
-#define CHECK_LE(a, b) CHECK((a) <= (b))
-#define CHECK_GT(a, b) CHECK((a) > (b))
-#define CHECK_LT(a, b) CHECK((a) < (b))
+#define CHECK_EQ(a, b) SPCHECK((a) == (b))
+#define CHECK_NE(a, b) SPCHECK((a) != (b))
+#define CHECK_GE(a, b) SPCHECK((a) >= (b))
+#define CHECK_LE(a, b) SPCHECK((a) <= (b))
+#define CHECK_GT(a, b) SPCHECK((a) > (b))
+#define CHECK_LT(a, b) SPCHECK((a) < (b))
 #define CHECK_NOTNULL(val)                                 \
   ::sentencepiece::error::CheckNotNull(__FILE__, __LINE__, \
                                        "'" #val "' Must be non NULL", (val))
@@ -170,13 +170,13 @@ enum LogSeverity {
 #define CHECK_OK(expr)                         \
   do {                                         \
     const auto _status = expr;                 \
-    CHECK(_status.ok()) << _status.ToString(); \
+    SPCHECK(_status.ok()) << _status.ToString(); \
   } while (0)
 
 #define CHECK_NOT_OK(expr)                      \
   do {                                          \
     const auto _status = expr;                  \
-    CHECK(!_status.ok()) << _status.ToString(); \
+    SPCHECK(!_status.ok()) << _status.ToString(); \
   } while (0)
 
 #define RETURN_IF_ERROR(expr)          \

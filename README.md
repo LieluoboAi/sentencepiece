@@ -231,12 +231,12 @@ Use `--extra_options` flag to decode the text in reverse order.
 ### End-to-End Example
 ```
 % spm_train --input=data/botchan.txt --model_prefix=m --vocab_size=1000
-unigram_model_trainer.cc(494) LOG(INFO) Starts training with :
+unigram_model_trainer.cc(494) SPLOG(INFO) Starts training with :
 input: "../data/botchan.txt"
 ... <snip>
-unigram_model_trainer.cc(529) LOG(INFO) EM sub_iter=1 size=1100 obj=10.4973 num_tokens=37630 num_tokens/piece=34.2091
-trainer_interface.cc(272) LOG(INFO) Saving model: m.model
-trainer_interface.cc(281) LOG(INFO) Saving vocabs: m.vocab
+unigram_model_trainer.cc(529) SPLOG(INFO) EM sub_iter=1 size=1100 obj=10.4973 num_tokens=37630 num_tokens/piece=34.2091
+trainer_interface.cc(272) SPLOG(INFO) Saving model: m.model
+trainer_interface.cc(281) SPLOG(INFO) Saving vocabs: m.vocab
 
 % echo "I saw a girl with a telescope." | spm_encode --model=m.model
 ▁I ▁saw ▁a ▁girl ▁with ▁a ▁ te le s c o pe .

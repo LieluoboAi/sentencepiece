@@ -274,7 +274,7 @@ TEST(NormalizerTest, NormalizeFullTest) {
   {
     const std::string input = " I   saw a　 　girl　　";
     EXPECT_OK(normalizer.Normalize(input, &output, &n2i));
-    LOG(INFO) << output;
+    SPLOG(INFO) << output;
     EXPECT_EQ(WS "I" WS "saw" WS "a" WS "girl", output);
     const std::vector<size_t> expected = {1,  1,  1,       // WS (3byte)
                                           1,               // I

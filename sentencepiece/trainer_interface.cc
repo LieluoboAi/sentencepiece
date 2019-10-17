@@ -123,7 +123,7 @@ bool TrainerInterface::IsValidSentencePiece(
       return false;
     }
     if (*it == 0x0020) {
-      LOG(WARNING) << "space must not be included in normalized string.";
+      SPLOG(WARNING) << "space must not be included in normalized string.";
       return false;
     }
     if (!string_util::IsValidCodepoint(*it)) {
@@ -181,7 +181,7 @@ util::Status TrainerInterface::LoadSentences() {
   const PrefixMatcher meta_pieces_matcher(meta_pieces_set);
 
   for (const auto &filename : trainer_spec_.input()) {
-    LOG(INFO) << "Loading corpus: " << filename;
+    SPLOG(INFO) << "Loading corpus: " << filename;
     std::string sentence;
     io::InputBuffer input(filename);
     RETURN_IF_ERROR(input.status());
@@ -198,11 +198,11 @@ util::Status TrainerInterface::LoadSentences() {
 
       constexpr int kMaxLines = 2048;
       if (sentence.size() > kMaxLines) {
-        LOG(INFO) << "Too long lines (>=" << kMaxLines << " bytes). Skipped.";
+        SPLOG(INFO) << "Too long lines (>=" << kMaxLines << " bytes). Skipped.";
         continue;
       }
       if (sentence.find(kUNKStr) != std::string::npos) {
-        LOG(INFO) << "Reserved chars are found. Skipped: " << sentence;
+        SPLOG(INFO) << "Reserved chars are found. Skipped: " << sentence;
         continue;
       }
       // Escapes meta symbols so that they are not extract as normal pieces.
@@ -212,14 +212,14 @@ util::Status TrainerInterface::LoadSentences() {
       // whitespaces are replaced with kWSChar.
       const std::string normalized = normalizer.Normalize(sentence);
       if (sentences_.size() % 100000 == 0) {
-        LOG(INFO) << "Loading: " << normalized
+        SPLOG(INFO) << "Loading: " << normalized
                   << "\tsize=" << sentences_.size();
       }
 
       CHECK_OR_RETURN(normalized.find(" ") == std::string::npos)
           << "Normalized string must not include spaces";
       if (normalized.empty()) {
-        LOG(WARNING) << "Empty string found. removed";
+        SPLOG(WARNING) << "Empty string found. removed";
         continue;
       }
 
@@ -233,7 +233,7 @@ util::Status TrainerInterface::LoadSentences() {
   }
 
 END:
-  LOG(INFO) << "Loaded " << sentences_.size() << " sentences";
+  SPLOG(INFO) << "Loaded " << sentences_.size() << " sentences";
 
   // Count character frequencies.
   int64 all_chars_count = 0;
@@ -242,7 +242,7 @@ END:
     for (const char32 c : string_util::UTF8ToUnicodeText(w.first)) {
       if (!string_util::IsValidCodepoint(c)) continue;
       if (c == 0x0000) {
-        LOG(INFO)
+        SPLOG(INFO)
             << "Found null character. The corpus must be encoded in utf-8.";
         continue;
       }
@@ -257,14 +257,14 @@ END:
       all_chars_count += w.second;
     }
   }
-  LOG(INFO) << "all chars count=" << all_chars_count;
+  SPLOG(INFO) << "all chars count=" << all_chars_count;
 
   // Determines required_chars which must be included in the vocabulary.
   int64 accumulated_chars_count = 0;
   for (const auto &w : Sorted(chars_count)) {
     const float coverage = 1.0 * accumulated_chars_count / all_chars_count;
     if (coverage >= trainer_spec_.character_coverage()) {
-      LOG(INFO) << "Done: " << 100.0 * coverage << "% characters are covered.";
+      SPLOG(INFO) << "Done: " << 100.0 * coverage << "% characters are covered.";
       break;
     }
     accumulated_chars_count += w.second;
@@ -272,7 +272,7 @@ END:
         << "space must not be included in normalized string.";
     required_chars_.insert(w);
   }
-  LOG(INFO) << "alphabet size=" << required_chars_.size();
+  SPLOG(INFO) << "alphabet size=" << required_chars_.size();
 
   CHECK_OR_RETURN(!port::ContainsKey(required_chars_, kUNKChar));
 
@@ -303,13 +303,13 @@ END:
         << "--character_coverage option.";
   }
 
-  LOG(INFO) << "Done! " << sentences_.size() << " sentences are loaded";
+  SPLOG(INFO) << "Done! " << sentences_.size() << " sentences are loaded";
 
   return util::OkStatus();
 }
 
 void TrainerInterface::SplitSentencesByWhitespace() {
-  LOG(INFO) << "Tokenizing input sentences with whitespace: "
+  SPLOG(INFO) << "Tokenizing input sentences with whitespace: "
             << sentences_.size();
   std::unordered_map<std::string, int64> tokens;
   for (const auto &s : sentences_) {
@@ -318,7 +318,7 @@ void TrainerInterface::SplitSentencesByWhitespace() {
     }
   }
   sentences_ = Sorted(tokens);
-  LOG(INFO) << "Done! " << sentences_.size();
+  SPLOG(INFO) << "Done! " << sentences_.size();
 }
 
 util::Status TrainerInterface::Serialize(ModelProto *model_proto) const {
@@ -374,7 +374,7 @@ util::Status TrainerInterface::Serialize(ModelProto *model_proto) const {
 }
 
 util::Status TrainerInterface::SaveModel(absl::string_view filename) const {
-  LOG(INFO) << "Saving model: " << filename;
+  SPLOG(INFO) << "Saving model: " << filename;
   ModelProto model_proto;
   RETURN_IF_ERROR(Serialize(&model_proto));
   std::ofstream ofs(WPATH(filename.data()), OUTPUT_MODE);
@@ -385,7 +385,7 @@ util::Status TrainerInterface::SaveModel(absl::string_view filename) const {
 }
 
 util::Status TrainerInterface::SaveVocab(absl::string_view filename) const {
-  LOG(INFO) << "Saving vocabs: " << filename;
+  SPLOG(INFO) << "Saving vocabs: " << filename;
   ModelProto model_proto;
   Serialize(&model_proto);
   io::OutputBuffer output(filename);
@@ -437,12 +437,12 @@ util::Status TrainerInterface::InitMetaPieces() {
                                 const std::string &w,
                                 ModelProto::SentencePiece::Type type) -> bool {
     if (!dup.insert(w).second) {
-      LOG(ERROR) << w << " is already defined.";
+      SPLOG(ERROR) << w << " is already defined.";
       return false;
     }
 
     if (w == ModelInterface::kUNK()) {
-      LOG(ERROR) << "<unk> must not be defined with --control_symbols and "
+      SPLOG(ERROR) << "<unk> must not be defined with --control_symbols and "
                     "--user_defined_symbols.";
       return false;
     }

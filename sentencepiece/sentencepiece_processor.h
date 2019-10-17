@@ -70,12 +70,12 @@ namespace sentencepiece {
 //   sp.Encode("hello world.", &spt);
 //   // Emits the byte range of each piece.
 //   for (const auto &piece : spt.pieces()) {
-//      LOG(INFO) << piece.begin() << " " << piece.end();
+//      SPLOG(INFO) << piece.begin() << " " << piece.end();
 //   }
 //
 //   sp.Decode({0, 1, 2, 3..}, &spt);
 //   for (const auto &piece : spt.pieces()) {
-//      LOG(INFO) << piece.begin() << " " << piece.end();
+//      SPLOG(INFO) << piece.begin() << " " << piece.end();
 //   }
 //
 

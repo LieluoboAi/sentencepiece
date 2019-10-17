@@ -484,7 +484,7 @@ util::Status SentencePieceProcessor::Decode(const std::vector<int> &ids,
 
 #define CHECK_STATUS_OR_RETURN_DEFAULT(value)                            \
   if (!status().ok()) {                                                  \
-    LOG(ERROR) << status().error_message() << "\nReturns default value " \
+    SPLOG(ERROR) << status().error_message() << "\nReturns default value " \
                << value;                                                 \
     return value;                                                        \
   }

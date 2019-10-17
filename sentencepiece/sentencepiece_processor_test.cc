@@ -425,7 +425,7 @@ TEST(SentencepieceProcessorTest, SampleEncodeTest) {
     else if (GetSpVec(nbest_result[1].first) == output)
       freq[1]++;
     else
-      LOG(FATAL) << "Invalid result.";
+      SPLOG(FATAL) << "Invalid result.";
   }
 
   const float expected_prob =
@@ -632,7 +632,7 @@ TEST(SentencePieceProcessorTest, EndToEndTest) {
 
   {
     std::ofstream ofs(WPATH(sf.filename()), OUTPUT_MODE);
-    CHECK(model_proto.SerializeToOstream(&ofs));
+    SPCHECK(model_proto.SerializeToOstream(&ofs));
   }
 
   SentencePieceProcessor sp;

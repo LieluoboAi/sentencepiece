@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
       output.WriteLine(nbest_spt.Utf8DebugString());
     };
   } else {
-    LOG(FATAL) << "Unknown output format: " << FLAGS_output_format;
+    SPLOG(FATAL) << "Unknown output format: " << FLAGS_output_format;
   }
 
   for (const auto &filename : rest_args) {

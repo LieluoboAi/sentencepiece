@@ -71,7 +71,7 @@ bool SetFlag(const std::string &name, const std::string &value) {
 #define DEFINE_ARG(FLAG_TYPE, CPP_TYPE)                        \
   case FLAG_TYPE: {                                            \
     CPP_TYPE *s = reinterpret_cast<CPP_TYPE *>(flag->storage); \
-    CHECK(string_util::lexical_cast<CPP_TYPE>(v, s));          \
+    SPCHECK(string_util::lexical_cast<CPP_TYPE>(v, s));          \
     break;                                                     \
   }
 

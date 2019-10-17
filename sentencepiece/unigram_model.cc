@@ -155,7 +155,7 @@ std::vector<Lattice::Node *> Lattice::Viterbi() {
         }
       }
       if (best_node == nullptr) {
-        LOG(ERROR) << "Failed to find the best path in Viterbi.";
+        SPLOG(ERROR) << "Failed to find the best path in Viterbi.";
         return {};
       }
       rnode->prev = best_node;
@@ -222,7 +222,7 @@ float Lattice::PopulateMarginal(float freq,
 
 std::vector<std::vector<Lattice::Node *>> Lattice::NBest(size_t nbest_size) {
   if (nbest_size < 1) {
-    LOG(WARNING) << "nbest_size >= 1. Returns empty result.";
+    SPLOG(WARNING) << "nbest_size >= 1. Returns empty result.";
     return {};
   }
 
@@ -312,7 +312,7 @@ std::vector<std::vector<Lattice::Node *>> Lattice::NBest(size_t nbest_size) {
     constexpr int kMaxAgendaSize = 100000;
     constexpr int kMinAgendaSize = 512;
     if (agenda.size() >= kMaxAgendaSize) {
-      LOG(WARNING) << "Too big agenda. shrinking";
+      SPLOG(WARNING) << "Too big agenda. shrinking";
       // Keeps the top `kMinAgendaSize` hypothesis.
       Agenda new_agenda;
       const int size = std::min<int>(kMinAgendaSize, nbest_size * 10);

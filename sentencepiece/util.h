@@ -367,7 +367,7 @@ const typename Collection::value_type::second_type &FindOrDie(
     const Collection &collection,
     const typename Collection::value_type::first_type &key) {
   typename Collection::const_iterator it = collection.find(key);
-  CHECK(it != collection.end()) << "Map key not found: " << key;
+  SPCHECK(it != collection.end()) << "Map key not found: " << key;
   return it->second;
 }
 
@@ -402,7 +402,7 @@ template <class Collection>
 void InsertOrDie(Collection *const collection,
                  const typename Collection::value_type::first_type &key,
                  const typename Collection::value_type::second_type &data) {
-  CHECK(InsertIfNotPresent(collection, key, data)) << "duplicate key";
+  SPCHECK(InsertIfNotPresent(collection, key, data)) << "duplicate key";
 }
 
 // hash

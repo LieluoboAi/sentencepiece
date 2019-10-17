@@ -56,8 +56,8 @@ Trainer::Symbol *Trainer::GetPairSymbol(const Symbol *left,
     return it->second;
   }
 
-  CHECK(!left->chars.empty());
-  CHECK(!right->chars.empty());
+  SPCHECK(!left->chars.empty());
+  SPCHECK(!right->chars.empty());
   string_util::UnicodeText ut;
   for (const char32 c : left->chars) ut.push_back(c);
   for (const char32 c : right->chars) ut.push_back(c);
@@ -163,7 +163,7 @@ void Trainer::UpdateActiveSymbols() {
 
   std::partial_sort(symbols.begin(), symbols.begin() + size, symbols.end(),
                     [](Symbol *s1, Symbol *s2) { return s1->freq > s2->freq; });
-  LOG(INFO) << "Updating active symbols. max_freq=" << symbols[0]->freq
+  SPLOG(INFO) << "Updating active symbols. max_freq=" << symbols[0]->freq
             << " min_freq=" << symbols[size - 1]->freq;
 
   active_symbols_.clear();
@@ -173,7 +173,7 @@ void Trainer::UpdateActiveSymbols() {
 util::Status Trainer::Train() {
   RETURN_IF_ERROR(status());
 
-  LOG(INFO) << "Starts training with : \n" << trainer_spec_.Utf8DebugString();
+  SPLOG(INFO) << "Starts training with : \n" << trainer_spec_.Utf8DebugString();
 
   CHECK_OR_RETURN(normalizer_spec_.escape_whitespaces());
   CHECK_EQ_OR_RETURN(TrainerSpec::BPE, trainer_spec_.model_type());
@@ -240,7 +240,7 @@ util::Status Trainer::Train() {
     }
 
     if (best_symbol == nullptr) {
-      LOG(WARNING) << "No valid symbol found";
+      SPLOG(WARNING) << "No valid symbol found";
       break;
     }
 
@@ -256,7 +256,7 @@ util::Status Trainer::Train() {
                                -static_cast<float>(final_pieces_.size()));
 
     if (final_pieces_.size() % 20 == 0) {
-      LOG(INFO) << "Added: freq=" << best_symbol->freq
+      SPLOG(INFO) << "Added: freq=" << best_symbol->freq
                 << " size=" << final_pieces_.size()
                 << " all=" << symbols_cache_.size()
                 << " active=" << active_symbols_.size()

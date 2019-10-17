@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     spec.set_name(FLAGS_normalization_rule_name);
     CHECK_OK(SentencePieceTrainer::PopulateNormalizerSpec(&spec));
   } else {
-    LOG(FATAL) << "Sets --model, normalization_rule_tsv, or "
+    SPLOG(FATAL) << "Sets --model, normalization_rule_tsv, or "
                   "normalization_rule_name flag.";
   }
 

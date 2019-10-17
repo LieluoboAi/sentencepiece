@@ -40,7 +40,7 @@ std::unique_ptr<TrainerInterface> TrainerFactory::Create(
                                                   normalizer_spec);
       break;
     default:
-      LOG(FATAL) << "Unknown model_type: " << trainer_spec.model_type();
+      SPLOG(FATAL) << "Unknown model_type: " << trainer_spec.model_type();
       break;
   }
 
